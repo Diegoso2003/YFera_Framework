@@ -8,6 +8,7 @@ IDENTIFICADOR					{LETRA}[a-zA-Z0-9\-]*
 VARIABLE					"$"{LETRA}[a-zA-Z0-9_]*
 IDENTI_VAR					{IDENTIFICADOR}[\-]?{VARIABLE}(-{IDENTIFICADOR})?
 NUMERO						[0-9]+
+DECIMAL						{NUMERO}"."{NUMERO}
 H_BASE						[0-9a-fA-F]
 HEX						{H_BASE}
 
@@ -87,6 +88,7 @@ HEX						{H_BASE}
 ")"						return 'PAREN_CERRA'
 ","						return 'COMA'
 {NUMERO}					return 'NUMERO'
+{DECIMAL}					return 'NUMERO'
 {NUMERO}"%"					return 'PORCENTAJE'
 <<EOF>>						return 'EOF'
 \s+						/* ignorar espacios en blanco */
@@ -97,127 +99,129 @@ HEX						{H_BASE}
 %start estilos
 %%
 
-estilos : clase
-	| estilos clase
-	| ciclo
-	| estilos ciclo
-	| estilos EOF
+estilos : clase							{ $$ = [$1] }
+	| estilos clase						{ $1.push($2); $$ = $1; }
+	| ciclo							{ $$ = [$1] }
+	| estilos ciclo						{ $$ = $1; $1.push($2); }
+	| error							{ $$ = [] }
+	| estilos error						{ $$ = $1 }
+	| estilos EOF						{ return $1; }
 	;
 
-clase : identi LLAVE_APER atributos LLAVE_CERRA
+clase : identi LLAVE_APER atributos LLAVE_CERRA			{ $$ = new Clase($1, $3); }
 	;
 	
-identi : nombre
-	| identi extends nombre
+identi : nombre							{ $$ = $1; }
+	| identi extends nombre					{ $$ = $1; $1.setPadre($3); }
 	;
 
-nombre : IDENTI
-	| IDENTI_VAR
+nombre : IDENTI							{ $$ = new NombreClase(new Simbolo($1, @1.first_line, @1.first_column), $1); }
+	| IDENTI_VAR						{ $$ = new NombreClase(new Simbolo($1, @1.first_line, @1.first_column), $1, true); }
 	;
 
-atributos : atributo P_COMA
-	| atributos atributo P_COMA
+atributos : atributo P_COMA					{ $$ = [$1] }
+	| atributos atributo P_COMA				{ $$ = $1; $1.push($2); }
+	| error P_COMA						{ $$ = []; }
+	| atributos error P_COMA				{ $$ = $1; }
 	;
 
-atributo : atributo_numerico
-	| atributo_color
-	| atributo_estilo
-	| atributo_px
-	| border ASIGNACION combinado
+atributo : atributo_numerico					{ $$ = $1 }
+	| atributo_color					{ $$ = $1 }
+	| atributo_estilo					{ $$ = $1 }
+	| atributo_px						{ $$ = $1 }
+	| border ASIGNACION combinado				{ $$ = new AtributoCombinado($1, $3); }		
 	;
 	
-border : BORDER 
-	| BORDER direccion
+border : BORDER 						{ $$ = "border" }
+	| BORDER DIRECTION					{ $$ = "border-"+$2+":"; }
 	;
 	
-combinado : expr B_STYLE color
+combinado : expr B_STYLE color					{ $$ = new Combinado($1, $2.toLowerCase(), $3); }
 	;
 	
-atributo_estilo : tipo_estilo ASIGNACION B_STYLE
+atributo_estilo : tipo_estilo ASIGNACION B_STYLE		{ $$ = new AtributoEstilo($1, $3.toLowerCase()); }
 	;
 	
-tipo_estilo : BORDER STYLE
-	| BORDER direccion STYLE
+tipo_estilo : BORDER STYLE					{ $$ = "border-style:" }
+	| BORDER DIRECCION STYLE				{ $$ = "border-"+$2+"-style:"; }
 	;
 	
-atributo_color : tipo_color ASIGNACION color
+atributo_color : tipo_color ASIGNACION color			{ $$ = new AtributoColor($1, $3); }
 	;
 	
-tipo_color : BACKGROUND COLOR
-	| COLOR
-	| BORDER COLOR
-	| BORDER direccion COLOR
+tipo_color : BACKGROUND COLOR					{ $$ = "background-color:"; }
+	| COLOR							{ $$ = "color:"; }
+	| BORDER COLOR						{ $$ = "border-color:"; }
+	| BORDER DIRECCION COLOR				{ $$ = "border-"+$2+"-color:"; }
 	;
 	
-color : HEX
-	| RGB PAREN_APER expr COMA expr COMA expr PAREN_CERRA
-	| COLOR_D
+color : HEX							{ $$ = new ColorString($1); }
+	| RGB PAREN_APER expr COMA expr COMA expr PAREN_CERRA	{ $$ = new ColorRgb($3, $5, $7); }
+	| RGB error						{ $$ = new ColorString("red"); }
+	| COLOR_D						{ $$ = new ColorString($1); }
 	;
 
-atributo_numerico : tipo_numerico ASIGNACION valor
+atributo_numerico : tipo_numerico ASIGNACION valor		{ $$ = new Atributo($1, $3); }
 	;
 	
-atributo_px : tipo_px ASIGNACION expr
+atributo_px : tipo_px ASIGNACION expr				{ $$ = new Atributo($1, $3); }
 	;
 	
-tipo_px : BORDER WIDTH
-	| BORDER direccion WIDTH
+tipo_px : BORDER WIDTH						{ $$ = "border-width:" }
+	| BORDER DIRECCION WIDTH				{ $$ = "border-"+$2+"-width"+":"; }
 	;
 	
-tipo_numerico : NUM_SIMPLE
-	| TEXT SIZE
-	| PADDING
-	| PADDING direccion
-	| MARGIN
-	| MARGIN direccion
-	| BORDER RADIUS
+tipo_numerico : NUM_SIMPLE					{ $$ = $1+":"; }
+	| TEXT SIZE						{ $$ = "font-size:"; }
+	| PADDING						{ $$ = "padding:" }
+	| PADDING DIRECCION					{ $$ = "padding-"+$2+":";}
+	| MARGIN						{ $$ = "margin:" }
+	| MARGIN DIRECCION					{ $$ = "margin-"+$2+":"; }
+	| BORDER RADIUS						{ $$ = "border-radius:"; }
 	;
 	
-direccion : LEFT
-	| TOP
-	| RIGHT
-	| BOTTOM
+valor : expr							{ $$ = $1 }
+	| PORCENTAJE						{ $$ = $1 }
 	;
 	
-valor : expr
-	| PORCENTAJE
+expr : expr SUMA term						{ $$ = new Suma($1, $3); }
+	| expr RESTA term					{ $$ = new Resta($1, $2); }
+	| term							{ $$ = $1; }
 	;
 	
-expr : expr SUMA term
-	| expr RESTA term
-	| term
+term : term MULTI mod						{ $$ = new Multi($1, $3); }
+	| term DIVI mod						{ $$ = new Division($1, $2); }
+	| mod							{ $$ = $1; }
 	;
 	
-term : term MULTI mod
-	| term DIVI mod
-	| mod
+mod : mod MODULO unario						{ $$ = new Modulo($1, $2); }
+	| PORCENTAJE unario					{ $$ = new Modulo($1, $2); }
+	| unario						{ $$ = $1 }
 	;
 	
-mod : mod MODULO unario
-	| PORCENTAJE unario
-	| unario
+unario : SUMA factor						{ $$ = $2 }
+	| RESTA factor						{ $$ = Negativo($2); }
+	| factor						{ $$ = $1 }
 	;
 	
-unario : SUMA factor
-	| RESTA factor
-	| factor
+factor : VAR							{ $$ = new Variable(new Simbolo($1, @1.first_line, @1.first_column), $1); }
+	| NUMERO						{ $$ = new Numero(new Simbolo($1, @1.first_line, @1.first_column), $1); }
+	| PAREN_APER expr PAREN_CERRA				{ $$ = $2 }
+	| error							{ $$ = new Numero(new Simbolo("error", 0, 0), "0", true); }
 	;
 	
-factor : VAR
-	| NUMERO
-	| PAREN_APER expr PAREN_CERRA
+ciclo : FOR VAR FROM NUMERO tipo NUMERO bloque			{ $$ = new CicloFor($2, $4, $5, $6, $7); }
 	;
 	
-ciclo : FOR VAR FROM NUMERO tipo NUMERO bloque
+tipo : THROUGH							{ $$ = true }
+	| TO							{ $$ = false }
 	;
 	
-tipo : THROUGH
-	| TO
+bloque : LLAVE_APER clases LLAVE_CERRA				{ $$ = $2 }
 	;
 	
-bloque : LLAVE_APER clases LLAVE_CERRA
-	;
-	
-clases : clase
-	| clases clase
+clases : clase							{ $$ = [$1] }
+	| error							{ $$ = [] }
+	| clases clase						{ $$ = $1; $1.push($2); }
+	| clases error						{ $$ = $1 }
 	;
