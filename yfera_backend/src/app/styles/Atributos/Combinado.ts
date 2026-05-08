@@ -11,4 +11,16 @@ export class Combinado {
     this.estilo = estilo;
     this.color = color;
   }
+
+  public getExpr(): Expresion {
+    return this.expr;
+  }
+
+  public getEstilo(): string {
+    return this.estilo;
+  }
+
+  public getColor(): ClaseColor {
+    return this.color;
+  }
 }

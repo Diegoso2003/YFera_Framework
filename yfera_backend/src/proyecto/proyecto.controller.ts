@@ -28,7 +28,9 @@ export class ProyectoController {
   }
 
   @Get('compilar/:nombre')
-  compilar() {}
+  async compilar(@Param('nombre') nombre: string) {
+    return await this.proyectoService.compilar(nombre);
+  }
 
   @Get('compilado/:nombre')
   obtenerCompilado() {}

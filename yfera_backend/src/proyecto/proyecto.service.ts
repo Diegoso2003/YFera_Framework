@@ -5,10 +5,12 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { EstructuraProyecto } from './dto/estructura-proyecto.dto';
 import archiver from 'archiver';
+import { AnalizadorGeneral } from '../app/AnalizadorGeneral';
 
 @Injectable()
 export class ProyectoService {
   public readonly proyectosPath = path.join(process.cwd(), 'data', 'proyectos');
+  private readonly compiladosPath = path.join(process.cwd(), 'data', 'compilados');
 
   async create(createProyectoDto: CreateProyectoDto) {
     const rutaProyecto = path.join(this.proyectosPath, createProyectoDto.nombre);
@@ -107,5 +109,41 @@ export class ProyectoService {
       type: 'application/zip',
       disposition: `attachment; filename="${nombre}.zip"`,
     });
+  }
+
+  async compilar(nombre: string) {
+    const rutaCompleta = path.join(this.compiladosPath, nombre);
+    const rutaActual = path.join(this.proyectosPath, nombre);
+    const existe = await this.carpetaExiste(rutaActual);
+    if (!existe) {
+      throw new NotFoundException(`No se encontro el proyecto '${nombre}'`);
+    }
+    const analizador = new AnalizadorGeneral();
+    await fs.rm(rutaCompleta, { recursive: true, force: true });
+    console.log(rutaCompleta);
+    await fs.mkdir(rutaCompleta);
+    console.log('hecho');
+    await this.compilarDirectorio(rutaActual, nombre, analizador);
+  }
+
+  private async compilarDirectorio(rutaActual: string, rutaRelativa: string, analizador: AnalizadorGeneral) {
+    const elementos = await fs.readdir(rutaActual, { withFileTypes: true });
+    for (const elemento of elementos) {
+      if (elemento.isFile() && elemento.name.endsWith('.db')) {
+        continue;
+      }
+      const rutaCompleta = path.join(rutaActual, elemento.name);
+      const nuevaRutaRelativa = path.join(rutaRelativa, elemento.name);
+
+      if (elemento.isDirectory()) {
+        await fs.mkdir(this.compiladosPath, rutaRelativa);
+        await this.compilarDirectorio(rutaCompleta, nuevaRutaRelativa, analizador);
+      } else {
+        const contenido = await fs.readFile(rutaCompleta, 'utf8');
+        const resultado = analizador.analizar(elemento.name, rutaRelativa, contenido);
+        const nuevoArchivo = path.join(this.compiladosPath, rutaRelativa, resultado.nombre);
+        await fs.writeFile(nuevoArchivo, resultado.contenido, 'utf-8');
+      }
+    }
   }
 }

@@ -33,7 +33,7 @@ export class Clase extends NodoEstilo {
     analizador.agregarClase(nombreClase, this);
     this.añadirHeredado(analizador);
     this.atributos.forEach((atributo) => {
-      const compilado = atributo.analizar(analizador);
+      const compilado = atributo.analizar(analizador) + ';';
       this.compilado.set(atributo.getAtributo(), compilado);
     });
   }
@@ -54,5 +54,9 @@ export class Clase extends NodoEstilo {
 
   public getNombre(): NombreClase {
     return this.nombre;
+  }
+
+  public getCompilado(): Map<string, string> {
+    return this.compilado;
   }
 }

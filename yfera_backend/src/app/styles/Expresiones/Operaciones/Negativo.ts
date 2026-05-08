@@ -1,5 +1,6 @@
 import { AnalizadorStyles } from '../../AnalizadorStyles';
 import { Expresion } from '../Expresion';
+import { Numero } from '../Numero';
 import { Operacion } from './Operacion';
 
 export class Negativo extends Operacion {
@@ -9,7 +10,12 @@ export class Negativo extends Operacion {
     this.expr1 = expr1;
   }
   obtenerValor(analizador: AnalizadorStyles): Expresion {
-    throw new Error('Method not implemented.');
+    const valor = this.expr1.obtenerValor(analizador);
+    if (valor.getError()) {
+      return valor;
+    }
+    const resultado = valor as Numero;
+    return new Numero(this.expr1.getSimbolo(), `${resultado.getNumero() * -1}`);
   }
   obtenerCompilado(): string {
     throw new Error('Method not implemented.');

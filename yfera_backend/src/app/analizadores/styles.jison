@@ -1,3 +1,101 @@
+%{
+    const { Clase } = require('../styles/Clase');
+const { NombreClase } = require('../styles/NombreClase');
+const { Simbolo } = require('../Simbolo');
+
+const { Atributo } = require('../styles/Atributos/Atributo');
+const { AtributoColor } = require('../styles/Atributos/AtributoColor');
+const { AtributoEstilo } = require('../styles/Atributos/AtributoEstilo');
+const { AtributoCombinado } = require('../styles/Atributos/AtributoCombinado');
+
+const { Combinado } = require('../styles/Atributos/Combinado');
+
+const { ColorString } = require('../styles/Colores/ColorString');
+const { ColorRgb } = require('../styles/Colores/ColorRgb');
+
+const { Suma } = require('../styles/Expresiones/Operaciones/Suma');
+const { Resta } = require('../styles/Expresiones/Operaciones/Resta');
+const { Multi } = require('../styles/Expresiones/Operaciones/Multi');
+const { Division } = require('../styles/Expresiones/Operaciones/Division');
+const { Modulo } = require('../styles/Expresiones/Operaciones/Modulo');
+const { Negativo } = require('../styles/Expresiones/Operaciones/Negativo');
+
+const { Variable } = require('../styles/Expresiones/Variable');
+const { Numero } = require('../styles/Expresiones/Numero');
+
+const { CicloFor } = require('../styles/CicloFor');
+    const { RegistroErrores } = require('../RegistroErrores');
+    const errorManager = RegistroErrores.getInstance();
+
+function traducirToken(token) {
+    switch(token) {
+        case "'ALIGN'": return "'align'";
+        case "'BACKGROUND'": return "'background'";
+        case "'COLOR_D'": return "'black | blue | gray | green | lightgray | red | violet | white'";
+        case "'BORDER'": return "'border'";
+        case "'BOTTOM'": return "'bottom'";
+        case "'DIRECTION'": return "'CENTER | LEFT | RIGHT'";
+        case "'COLOR'": return "'color'";
+        case "'FUENTE'": return "'CURSIVE | HELVETICA | MONO | SANS | SANS_SERIF'";
+        case "'B_STYLE'": return "'DOTTED | DOUBLE | LINE'";
+        case "'EXTENDS'": return "'extends'";
+        case "'FONT'": return "'font'";
+        case "'FROM'": return "'from'";
+        case "'LEFT'": return "'left'";
+        case "'MARGIN'": return "'margin'";
+        case "'NUM_SIMPLE'": return "'height | width | min-height | max-height | min-width | max-width'";
+        case "'PADDING'": return "'padding'";
+        case "'RADIUS'": return "'radius'";
+        case "'RGB'": return "'rgb'";
+        case "'RIGHT'": return "'right'";
+        case "'SIZE'": return "'size'";
+        case "'STYLE'": return "'style'";
+        case "'TEXT'": return "'text'";
+        case "'THROUGH'": return "'through'";
+        case "'TO'": return "'to'";
+        case "'TOP'": return "'top'";
+        case "'FOR'": return "'@for'";
+        case "'IDENTI'": return "'identificador'";
+        case "'VAR'": return "'variable'";
+        case "'IDENTI_VAR'": return "'identi-var'";
+        case "'LLAVE_APER'": return "'{'";
+        case "'LLAVE_CERRA'": return "'}'";
+        case "'ASIGNACION'": return "'='";
+        case "'P_COMA'": return "';'";
+        case "'SUMA'": return "'+'";
+        case "'RESTA'": return "'-'";
+        case "'MULTI'": return "'*'";
+        case "'DIVI'": return "'/'";
+        case "'MODULO'": return "'%'";
+        case "'PAREN_APER'": return "'('";
+        case "'PAREN_CERRA'": return "')'";
+        case "'COMA'": return "','";
+        case "'NUMERO'": return "'numero'";
+        case "'PORCENTAJE'": return "'numero%'";
+        default: return token;
+    }
+}
+
+    function construirDescripcionError(expected) {
+        if (!expected || expected.length === 0) {
+            return "Ya no se esperaba ningún token en este punto";
+        }
+        const tokens = expected.map(t => traducirToken(t));
+        return `Se esperaba: ${tokens.join(" | ")}`;
+    }
+
+    parser.parseError = function (str, hash) {
+        errorManager.agregarError({
+            tipo: "Sintactico",
+            lexema: hash.text,
+            linea: (hash.loc?.first_line || 0),
+            columna: (hash.loc?.first_column || 0),
+            descripcion: construirDescripcionError(hash.expected)
+        });
+        
+        return;
+    };
+%}
 %lex
 
 %options locations
@@ -92,7 +190,19 @@ HEX						{H_BASE}
 {NUMERO}"%"					return 'PORCENTAJE'
 <<EOF>>						return 'EOF'
 \s+						/* ignorar espacios en blanco */
-.						/* manejar el error */
+.						{
+    if (yytext && yytext.length > 0) {
+        const errorLexico = {
+            tipo: "Lexico",
+            lexema: yytext,
+            linea: yylloc.first_line,
+            columna: yylloc.first_column+1,
+            descripcion: `Caracter no reconocido: '${yytext}'`
+        };
+        
+        errorManager.agregarError(errorLexico);
+    }
+}
 
 /lex
 

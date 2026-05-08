@@ -1,0 +1,30 @@
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center">
+    <form [formGroup]="formulario" (submit)="crear()"
+        class="p-6 mx-auto max-w-md space-y-4 rounded-lg border border-gray-300 bg-gray-100 dark:border-gray-600 dark:bg-gray-800">
+        <h2 class="font-bold mb-2">Crear Archivo</h2>
+        <div>
+            <label class="block text-sm font-medium text-gray-900 dark:text-white" for="name">
+                Nombre
+            </label>
+
+            <input formControlName="nombre"
+                class="mt-1 w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                id="name" type="text" placeholder="Escriba el nombre del archivo">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-900 dark:text-white" for="name">
+                Tipo de archivo
+            </label>
+            <select class="w-full border p-2 mb-2  border-gray-300 focus:border-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white" formControlName="tipo">
+                <option value="CARPETA">Carpeta</option>
+                <option value="STYLES">.styles</option>
+                <option value="COMPONENT">.component</option>
+                <option value="PRINCIPAL">.y</option>
+            </select>
+        </div>
+        <div class="flex justify-end gap-2">
+            <app-boton texto="cancelar" (click)="cerrar.emit()"></app-boton>
+            <app-boton texto="crear" [tipoBoton]="'submit'"></app-boton>
+        </div>
+    </form>
+</div>

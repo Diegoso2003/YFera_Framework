@@ -1,0 +1,24 @@
+<div class="ml-2">
+    <div (click)="toogle()" class="flex items-center justify-between hover:bg-gray-700 px-2 py-1 rounded">
+        <div class="cursor-pointer flex gap-2">
+            @if(archivoNodo().carpeta){
+            <span>📁</span>
+            } @else {
+            <span>📄</span>
+            }
+            <span>{{archivoNodo().nombre}}</span>
+        </div>
+        <div class="flex gap-5">
+            @if(archivoNodo().carpeta){
+            <button (click)="crear.emit(archivoNodo())" class="text-green-400">+</button>
+            }
+            <button (click)="eliminar.emit(archivoNodo())" class="text-red-500">x</button>
+        </div>
+    </div>
+    @if(expandido() && archivoNodo().carpeta){
+    @for(archivo of archivoNodo().hijos; track archivo.ruta){
+    <app-archivo [archivoNodo]="archivo" (abrirArchivo)="abrirArchivo.emit($event)" (crear)="crear.emit($event)"
+        (eliminar)="eliminar.emit($event)"></app-archivo>
+    }
+    }
+</div>

@@ -1,0 +1,10 @@
+<div class="h-full flex flex-col">
+    <div class="bg-gray-800 text-white px-4 py-2">
+        {{ archivo()?.nombre || 'sin archivo abierto' }}
+    </div>
+    <textarea [(ngModel)]="contenido" rows="32"
+        class="flex-1 w-full p-4 bg-gray-900 text-white outline-none resize-none"></textarea>
+    <div class="flex justify-center py-5">
+        <app-boton texto="guardar" (click)="guardar()"></app-boton>
+    </div>
+</div>

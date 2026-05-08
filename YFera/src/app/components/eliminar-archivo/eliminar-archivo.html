@@ -1,0 +1,19 @@
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center">
+    <div class="border-gray-300 bg-gray-100 dark:border-gray-600 dark:bg-gray-800 p-4 w-80">
+        <h2 class="font-bold-mb4 p-5">
+            <span>
+                ¿Eliminar 
+            </span>
+            @if(archivoNodo().carpeta){
+                <span>carpeta </span>
+            } @else {
+                <span>archivo </span>
+            }
+            <span>'{{archivoNodo().nombre}}'?</span>
+        </h2>
+        <div class="flex justify-end gap-2">
+            <app-boton texto="cancelar" (click)="cerrar.emit()"></app-boton>
+            <app-boton texto="eliminar" (click)="eliminar()"></app-boton>
+        </div>
+    </div>
+</div>
