@@ -12,6 +12,7 @@ import { EliminarArchivo } from "../../components/eliminar-archivo/eliminar-arch
 import { ArchivoService } from '../../services/archivo-service';
 import { ContenidoCarga } from '../../models/ContenidoCarga';
 import { Boton } from "../../components/boton/boton";
+import { ArchivoErrores } from '../../models/ArchivoErrores';
 
 @Component({
   selector: 'app-proyecto',
@@ -106,8 +107,10 @@ export class Proyecto implements OnInit {
 
   compilar() {
     this._proyectS.compilar(this.nombreProyecto()).subscribe({
-      next: () => {
-
+      next: (errores: ArchivoErrores[]) => {
+        if(errores.length > 0){
+          this._info.mostrarErrorCompilacion(errores);
+        }
       },
       error: (error: HttpErrorResponse) => {
         this._info.mostrarError(extraerMensajeError(error, 'error al compilar intente más tarde'))

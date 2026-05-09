@@ -4,6 +4,7 @@ import { API_URL } from '../api';
 import { Observable } from 'rxjs';
 import { ProyectoModel } from '../models/ProyectoModel';
 import { EstructuraModel } from '../models/EstructuraModel';
+import { ArchivoErrores } from '../models/ArchivoErrores';
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +30,7 @@ export class ProyectoService {
     return this._http.get(`${this.url}/arbol/${proyecto}`, { responseType: 'blob'  });
   }
 
-  compilar(proyecto: string): Observable<void> {
-    return this._http.get<void>(`${this.url}/compilar/${proyecto}`);
+  compilar(proyecto: string): Observable<ArchivoErrores[]> {
+    return this._http.get<ArchivoErrores[]>(`${this.url}/compilar/${proyecto}`);
   }
 }

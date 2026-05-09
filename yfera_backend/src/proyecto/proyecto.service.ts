@@ -5,7 +5,8 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { EstructuraProyecto } from './dto/estructura-proyecto.dto';
 import archiver from 'archiver';
-import { AnalizadorGeneral } from '../app/AnalizadorGeneral';
+import { AnalizadorGeneral } from '../backend/AnalizadorGeneral';
+import { RegistroErrores } from '../backend/RegistroErrores';
 
 @Injectable()
 export class ProyectoService {
@@ -118,12 +119,13 @@ export class ProyectoService {
     if (!existe) {
       throw new NotFoundException(`No se encontro el proyecto '${nombre}'`);
     }
+    const errores = RegistroErrores.getInstance();
+    errores.clear();
     const analizador = new AnalizadorGeneral();
     await fs.rm(rutaCompleta, { recursive: true, force: true });
-    console.log(rutaCompleta);
     await fs.mkdir(rutaCompleta);
-    console.log('hecho');
     await this.compilarDirectorio(rutaActual, nombre, analizador);
+    return errores.getErrores();
   }
 
   private async compilarDirectorio(rutaActual: string, rutaRelativa: string, analizador: AnalizadorGeneral) {
@@ -136,11 +138,12 @@ export class ProyectoService {
       const nuevaRutaRelativa = path.join(rutaRelativa, elemento.name);
 
       if (elemento.isDirectory()) {
-        await fs.mkdir(this.compiladosPath, rutaRelativa);
+        const rutaCompilacion = path.join(this.compiladosPath, nuevaRutaRelativa);
+        await fs.mkdir(rutaCompilacion);
         await this.compilarDirectorio(rutaCompleta, nuevaRutaRelativa, analizador);
       } else {
         const contenido = await fs.readFile(rutaCompleta, 'utf8');
-        const resultado = analizador.analizar(elemento.name, rutaRelativa, contenido);
+        const resultado = analizador.analizar(elemento.name, nuevaRutaRelativa, contenido);
         const nuevoArchivo = path.join(this.compiladosPath, rutaRelativa, resultado.nombre);
         await fs.writeFile(nuevoArchivo, resultado.contenido, 'utf-8');
       }

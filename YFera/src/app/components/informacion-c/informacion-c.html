@@ -1,44 +1,120 @@
 @if(_info.mostrar()) {
-    <!-- Overlay -->
-    <div class="fixed inset-0 z-40 bg-black/50" (click)="_info.ocultarError()"></div>
-    
-    <!-- Modal -->
-    <div class="fixed inset-0 z-50 grid place-content-center p-4">
-        <div class="w-full max-w-md border-2 border-red-600 bg-red-100 p-6 shadow-[4px_4px_0_0] dark:border-red-800 dark:bg-red-950">
-            
-            <div class="flex items-start gap-3">
-                <!-- Icono -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="mt-0.5 size-5 shrink-0 text-red-900 dark:text-red-200">
-                    <path fill-rule="evenodd"
-                        d="M6.701 2.25c.577-1 2.02-1 2.598 0l5.196 9a1.5 1.5 0 0 1-1.299 2.25H2.804a1.5 1.5 0 0 1-1.3-2.25l5.197-9ZM8 4a.75.75 0 0 1 .75.75v3a.75.75 0 1 1-1.5 0v-3A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
-                        clip-rule="evenodd" />
+<div class="fixed inset-0 z-40 bg-black/50" (click)="_info.ocultarError()"></div>
+<div class="fixed inset-0 z-50 grid place-content-center p-4">
+    <div
+        class="w-full max-w-md border-2 border-red-600 bg-red-100 p-6 shadow-[4px_4px_0_0] dark:border-red-800 dark:bg-red-950">
+
+        <div class="flex items-start gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
+                class="mt-0.5 size-5 shrink-0 text-red-900 dark:text-red-200">
+                <path fill-rule="evenodd"
+                    d="M6.701 2.25c.577-1 2.02-1 2.598 0l5.196 9a1.5 1.5 0 0 1-1.299 2.25H2.804a1.5 1.5 0 0 1-1.3-2.25l5.197-9ZM8 4a.75.75 0 0 1 .75.75v3a.75.75 0 1 1-1.5 0v-3A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+                    clip-rule="evenodd" />
+            </svg>
+
+            <div class="flex-1">
+                <h2 class="text-xl font-bold text-red-900 dark:text-red-200">Error</h2>
+                <p class="mt-1 font-semibold text-red-900 dark:text-red-200">
+                    {{ _info.mensaje() }}
+                </p>
+            </div>
+
+            <button (click)="_info.ocultarError()"
+                class="shrink-0 rounded-full p-1 text-red-700 transition-colors hover:bg-red-200 dark:text-red-300 dark:hover:bg-red-800">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
                 </svg>
+            </button>
+        </div>
 
-                <div class="flex-1">
-                    <h2 class="text-xl font-bold text-red-900 dark:text-red-200">Error</h2>
-                    <p class="mt-1 font-semibold text-red-900 dark:text-red-200">
-                        {{ _info.mensaje() }}
-                    </p>
-                </div>
-
-                <!-- Botón cerrar X -->
-                <button 
-                    (click)="_info.ocultarError()"
-                    class="shrink-0 rounded-full p-1 text-red-700 transition-colors hover:bg-red-200 dark:text-red-300 dark:hover:bg-red-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Botón Aceptar abajo -->
-            <div class="mt-6 flex justify-end">
-                <button 
-                    (click)="_info.ocultarError()"
-                    class="rounded-lg border-2 border-red-600 bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700">
-                    Aceptar
-                </button>
-            </div>
+        <div class="mt-6 flex justify-end">
+            <button (click)="_info.ocultarError()"
+                class="rounded-lg border-2 border-red-600 bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700">
+                Aceptar
+            </button>
         </div>
     </div>
+</div>
+}
+
+@if(_info.mostrarTabla()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-white rounded-xl shadow-2xl max-w-6xl w-full max-h-[90vh] flex flex-col m-4">
+        <div class="flex justify-between items-center p-6 border-b border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-800">
+                Errores encontrados
+            </h2>
+            <button (click)="_info.ocultarTabla()"
+                class="text-gray-400 hover:text-gray-600 transition-colors text-3xl leading-none">
+                ×
+            </button>
+        </div>
+        <div class="flex-1 overflow-auto ">
+            @for(archivo of _info.errores(); track $index){
+            <div class="p-6 bg-gray-50 border-b border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="font-semibold text-gray-700">📁 Ruta:</span>
+                        <span class="text-gray-600 font-mono text-sm break-all">{{ archivo.ruta }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    #
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Línea</th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Columna</th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Lexema</th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Tipo</th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @for(error of archivo.errores; track $index) {
+
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-4 py-3 text-sm text-gray-500">{{ $index + 1 }}</td>
+                                <td class="px-4 py-3 text-sm font-mono text-gray-900">{{ error.linea }}</td>
+                                <td class="px-4 py-3 text-sm font-mono text-gray-900">{{ error.columna }}</td>
+                                <td class="px-4 py-3 text-sm font-mono text-gray-900">
+                                    <span class="px-2 py-1 bg-gray-100 rounded">{{ error.lexema || '-' }}</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm font-mono text-gray-900">{{ error.tipo }}</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">{{ error.descripcion }}</td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            }
+
+        </div>
+        <div class="flex justify-end p-6 border-t border-gray-200">
+            <button (click)="_info.ocultarTabla()"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
 }
