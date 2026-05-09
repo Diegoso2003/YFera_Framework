@@ -105,7 +105,7 @@ function traducirToken(token) {
         case "'EOF'": return "'fin de archivo'";
         default: return token;
     }
-
+}
     function construirDescripcionError(expected) {
         if (!expected || expected.length === 0) {
             return "Ya no se esperaba ningún token en este punto";
@@ -135,9 +135,9 @@ function traducirToken(token) {
 IDENTI						[a-zA-Z][a-zA-Z0-9_]*
 COMPONENTE					"@"{IDENTI}
 N_CARPETA					[^/\x00]+
-STYLES						[^/\x00]+\."styles"
-COMPON						[^/\x00]+\."comp"
-PRINCIPAL					[^/\x00]+\."y"
+STYLES						[^/\x00]+".styles"
+COMPON						[^/\x00]+".comp"
+PRINCIPAL					[^/\x00]+".y"
 ENTERO						[0-9]+
 FLOAT						[0-9]+\.[0-9]+
 CHAR						"'"("\n"|"\t"|"\r"|"\'"|"\\\\"|"\b"|[^'\\\n])"'"

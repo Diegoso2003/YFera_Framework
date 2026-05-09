@@ -522,7 +522,7 @@ function traducirToken(token) {
         case "'EOF'": return "'fin de archivo'";
         default: return token;
     }
-
+}
     function construirDescripcionError(expected) {
         if (!expected || expected.length === 0) {
             return "Ya no se esperaba ningún token en este punto";
