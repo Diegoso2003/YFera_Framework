@@ -134,10 +134,10 @@ function traducirToken(token) {
 
 IDENTI						[a-zA-Z][a-zA-Z0-9_]*
 COMPONENTE					"@"{IDENTI}
-N_CARPETA					[a-zA-Z][a-zA-Z_\-]+
-STYLES						[a-zA-Z][a-zA-Z_\-]+".styles"
-COMPON						[a-zA-Z][a-zA-Z_\-]+".comp"
-PRINCIPAL					[a-zA-Z][a-zA-Z_\-]+".y"
+N_CARPETA					[a-zA-Z][0-9a-zA-Z_\-]+
+STYLES						[a-zA-Z][0-9a-zA-Z_\-]+".styles"
+COMPON						[a-zA-Z][0-9a-zA-Z_\-]+".comp"
+PRINCIPAL					[a-zA-Z][0-9a-zA-Z_\-]+".y"
 ENTERO						[0-9]+
 FLOAT						[0-9]+\.[0-9]+
 CHAR						"'"("\n"|"\t"|"\r"|"\'"|"\\\\"|"\b"|[^'\\\n])"'"
@@ -156,10 +156,10 @@ CHAR						"'"("\n"|"\t"|"\r"|"\'"|"\\\\"|"\b"|[^'\\\n])"'"
 <CARPETA>"."					return 'ACTUAL'
 <CARPETA>".."					return 'SALIR'
 <CARPETA>"/"					return 'SLASH'
-<CARPETA>{N_CARPETA}				return 'CARPETA'
 <CARPETA>{STYLES}				return 'A_STYLES'
 <CARPETA>{COMPON}				return 'A_COMPON'
 <CARPETA>{PRINCIPAL}				return 'A_PRINCIPAL'
+<CARPETA>{N_CARPETA}				return 'CARPETA'
 <CARPETA>"\""					this.popState(); return 'COMILLA';
 <CARPETA>.					{
     if (yytext && yytext.length > 0) {
@@ -377,8 +377,8 @@ archivo : A_STYLES
 	| A_PRINCIPAL
 	;
 	
-carpetas: carpeta
-	| carpetas SLASH carpeta
+carpetas: CARPETA
+	| carpetas SLASH CARPETA
 	;
 	
 salida : SALIDA
