@@ -134,10 +134,10 @@ function traducirToken(token) {
 
 IDENTI						[a-zA-Z][a-zA-Z0-9_]*
 COMPONENTE					"@"{IDENTI}
-N_CARPETA					[^/\x00]+
-STYLES						[^/\x00]+".styles"
-COMPON						[^/\x00]+".comp"
-PRINCIPAL					[^/\x00]+".y"
+N_CARPETA					[a-zA-Z][a-zA-Z_\-]+
+STYLES						[a-zA-Z][a-zA-Z_\-]+".styles"
+COMPON						[a-zA-Z][a-zA-Z_\-]+".comp"
+PRINCIPAL					[a-zA-Z][a-zA-Z_\-]+".y"
 ENTERO						[0-9]+
 FLOAT						[0-9]+\.[0-9]+
 CHAR						"'"("\n"|"\t"|"\r"|"\'"|"\\\\"|"\b"|[^'\\\n])"'"
