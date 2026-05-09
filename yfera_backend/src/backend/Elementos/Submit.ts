@@ -16,7 +16,7 @@ export class Submit {
   }
 
   analizar(analizador: CompiladorComponent) {
-    let resultado = `<button type="button" (onclick)="${analizador.getNombre() + analizador.getCantidadF()}"`;
+    let resultado = `<button type="button" onclick="${analizador.getNombre() + analizador.getCantidadF()}()"`;
     if (this.estilos.length > 0) {
       resultado += ' class="';
       this.estilos.forEach((clase) => {
@@ -25,7 +25,7 @@ export class Submit {
       });
       resultado += '"';
     }
-    resultado += `>${this.label.analizar(analizador, Tipo.STRING)}`;
+    resultado += `>\${${this.label.analizar(analizador, Tipo.STRING)}}`;
     resultado += '</button>';
     return resultado;
   }

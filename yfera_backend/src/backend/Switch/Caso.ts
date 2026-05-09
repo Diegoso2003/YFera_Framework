@@ -23,17 +23,17 @@ export class Caso extends CasoBase {
     }
     let resultado = `\ncase ${res.texto}:`;
     analizador.setAceptaVariables(true);
-    if (analizador.getComponente()) {
-      resultado += '\nresultado += `';
-    }
+    resultado += 'resultado += `';
+    analizador.setComponente(true);
     this.elementos.forEach((elemento) => {
       resultado += elemento.analizar(analizador);
     });
     if (analizador.getComponente()) {
       resultado += '`;';
+      analizador.setComponente(false);
     }
     if (this.agregarBreak) {
-      resultado += 'break;';
+      resultado += '\nbreak;';
     }
     return resultado;
   }

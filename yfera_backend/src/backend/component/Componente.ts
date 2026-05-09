@@ -30,6 +30,9 @@ export class Componente {
     this.elementos.forEach((elemento) => {
       compilado += '\n' + elemento.analizar(analizador);
     });
+    if (analizador.getComponente()) {
+      compilado += '`;';
+    }
     compilado += `\nreturn resultado;
   }catch(error) {
       alert(error.message);

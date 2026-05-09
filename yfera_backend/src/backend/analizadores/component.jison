@@ -438,7 +438,7 @@ expr : expr oper_aritmetica unario				{ $$ = new Operacion($1, $2, $3); }
      	;
     
 unario : factor
-     	| unario factor						{ $$ = new Unario($1, $2); }
+     	| simb factor						{ $$ = new Unario($1, $2); }
 	| variable INCRE					{ $$ = new Incremento($1, $2, true); }
 	| INCRE variable					{ $$ = new Incremento($1, $2); }
      	;

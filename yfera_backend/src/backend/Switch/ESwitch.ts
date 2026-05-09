@@ -24,15 +24,15 @@ export class ESwitch extends NodoElemento {
       return '';
     }
     if (analizador.getComponente()) {
-      res = '`;';
+      res += '`;';
       analizador.setComponente(false);
     }
-    res = `\nswitch(${resultado.texto}){`;
+    res += `\nswitch(${resultado.texto}){`;
     this.casos.forEach((caso) => {
       res += caso.analizar(analizador, resultado.tipo.getTipo());
     });
-    res = '\n}';
-    res = 'resultado += `';
+    res += '\n}';
+    res += 'resultado += `';
     analizador.setComponente(true);
     return res;
   }

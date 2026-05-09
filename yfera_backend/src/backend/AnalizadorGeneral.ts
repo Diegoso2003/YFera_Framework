@@ -1,4 +1,5 @@
 import { CompiladorComponent } from './compiladores/CompiladorComponent';
+import { CompiladorY } from './compiladores/CompiladorY';
 import { RegistroErrores } from './RegistroErrores';
 import { ResultadoArchivo } from './ResultadoArchivo';
 import { AnalizadorStyles } from './styles/AnalizadorStyles';
@@ -27,6 +28,10 @@ export class AnalizadorGeneral {
         nombre: nombre.replace('.component', '.js'),
         contenido: compilado,
       };
+    } else if (nombre.endsWith('.y')) {
+      const principal = new CompiladorY();
+      principal.analizar(input);
+      errores.añadirActual();
     }
     return {
       nombre: nombre,
